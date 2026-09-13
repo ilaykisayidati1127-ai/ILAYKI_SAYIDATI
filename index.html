@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>إليكِ سيدتي | Ilayki Sayidati</title>
+<style>
+:root{--pink:#f8dce9;--purple:#8b6aa8;--deep:#5d426f;--cream:#fff9fc}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:var(--cream);color:#4d3b52}
+header{background:linear-gradient(120deg,var(--pink),#e9ddf7);padding:22px 6%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}
+.logo{font-size:25px;font-weight:bold;color:var(--deep)}.logo small{display:block;font-size:14px;direction:ltr}
+nav button,.btn{border:0;border-radius:22px;padding:11px 17px;background:var(--purple);color:white;cursor:pointer;margin:3px}
+.hero{text-align:center;padding:48px 20px;background:linear-gradient(180deg,#fff0f6,#fff9fc)}
+.hero h1{font-size:42px;margin:10px;color:var(--deep)}.hero p{font-size:18px}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;padding:20px 6%}
+.card{background:white;border-radius:18px;box-shadow:0 5px 18px #7b5b8b18;overflow:hidden;padding-bottom:15px}
+.pic{height:170px;background:linear-gradient(135deg,#f6d8e8,#e5dcf4);display:grid;place-items:center;font-size:65px}
+.card h3,.card p{padding:0 15px}.price{color:var(--purple);font-weight:bold}
+.btn.full{width:calc(100% - 30px);margin:0 15px}
+.panel{display:none;background:white;margin:25px 6%;padding:25px;border-radius:18px;box-shadow:0 5px 18px #7b5b8b18}
+input,select{padding:12px;border:1px solid #e5d8eb;border-radius:10px;margin:5px;width:calc(100% - 10px)}
+footer{text-align:center;padding:30px;background:#f1e5f5;margin-top:30px}
+</style>
+</head>
+<body>
+<header><div class="logo">إليكِ سيدتي <small>Ilayki Sayidati</small></div>
+<nav><button onclick="showCart()">🛍️ السلة (<span id="count">0</span>)</button><button onclick="toggleAdmin()">لوحة التحكم</button><button onclick="toggleLang()">Français / العربية</button></nav></header>
+<section class="hero"><h1 id="title">إليكِ سيدتي</h1><p id="subtitle">أناقتكِ تبدأ من التفاصيل الصغيرة ✨</p><button class="btn" onclick="document.getElementById('products').scrollIntoView()">تسوقي الآن</button></section>
+<div class="controls"><button class="btn" onclick="filter('all')">الكل</button><button class="btn" onclick="filter('jewelry')">إكسسوارات</button><button class="btn" onclick="filter('bags')">حقائب</button></div>
+<section class="grid" id="products"></section>
+<section class="panel" id="cart"><h2>سلة المشتريات</h2><div id="cartItems"></div><h3>المجموع: <span id="total">0</span> DH</h3><button class="btn" onclick="checkout()">إتمام الطلب</button></section>
+<section class="panel" id="checkout"><h2>إتمام الطلب</h2><input id="name" placeholder="الاسم الكامل"><input id="phone" placeholder="رقم الهاتف"><input id="city" placeholder="المدينة والعنوان"><select id="payment"><option>الدفع عند الاستلام</option></select><button class="btn" onclick="submitOrder()">تأكيد الطلب</button><p id="confirmation"></p></section>
+<section class="panel" id="admin"><h2>لوحة التحكم التجريبية</h2><p>يمكنكِ إضافة منتج جديد محليًا داخل هذه الصفحة.</p><input id="pname" placeholder="اسم المنتج"><input id="pprice" type="number" placeholder="السعر بالدرهم"><select id="ptype"><option value="jewelry">إكسسوارات</option><option value="bags">حقائب</option></select><button class="btn" onclick="addProduct()">إضافة المنتج</button><div id="orders"></div></section>
+<footer>© 2026 إليكِ سيدتي | Ilayki Sayidati</footer>
+<script>
+let lang='ar', cart=[], orders=[], products=[
+{id:1,name:'سوار أنيق',fr:'Bracelet élégant',price:49,type:'jewelry',emoji:'💍'},
+{id:2,name:'سلسلة نسائية',fr:'Collier féminin',price:79,type:'jewelry',emoji:'📿'},
+{id:3,name:'حقيبة نسائية صغيرة',fr:'Petit sac féminin',price:149,type:'bags',emoji:'👜'},
+{id:4,name:'محفظة أنيقة',fr:'Portefeuille chic',price:89,type:'bags',emoji:'👛'}
+];
+function render(list=products){document.getElementById('products').innerHTML=list.map(p=>`<article class="card"><div class="pic">${p.emoji}</div><h3>${lang==='ar'?p.name:p.fr}</h3><p class="price">${p.price} DH</p><button class="btn full" onclick="add(${p.id})">${lang==='ar'?'أضيفي إلى السلة':'Ajouter au panier'}</button></article>`).join('')}
+function filter(t){render(t==='all'?products:products.filter(p=>p.type===t))}
+function add(id){cart.push(products.find(p=>p.id===id));updateCart();alert(lang==='ar'?'تمت الإضافة إلى السلة':'Ajouté au panier')}
+function updateCart(){document.getElementById('count').textContent=cart.length;document.getElementById('cartItems').innerHTML=cart.map((p,i)=>`<p>${p.name} — ${p.price} DH <button onclick="removeItem(${i})">×</button></p>`).join('');document.getElementById('total').textContent=cart.reduce((s,p)=>s+p.price,0)}
+function removeItem(i){cart.splice(i,1);updateCart()}
+function showCart(){document.getElementById('cart').style.display='block';updateCart()}
+function checkout(){document.getElementById('checkout').style.display='block'}
+function submitOrder(){if(!cart.length)return alert('السلة فارغة');orders.push({name:document.getElementById('name').value,phone:document.getElementById('phone').value,city:document.getElementById('city').value,total:cart.reduce((s,p)=>s+p.price,0)});document.getElementById('confirmation').textContent='تم تسجيل طلبكِ تجريبيًا بنجاح 🌸';document.getElementById('orders').innerHTML='<h3>الطلبات المسجلة</h3>'+orders.map(o=>`<p>${o.name} — ${o.phone} — ${o.total} DH</p>`).join('');cart=[];updateCart()}
+function toggleAdmin(){let e=document.getElementById('admin');e.style.display=e.style.display==='block'?'none':'block'}
+function addProduct(){let p={id:Date.now(),name:document.getElementById('pname').value,fr:document.getElementById('pname').value,price:Number(document.getElementById('pprice').value),type:document.getElementById('ptype').value,emoji:document.getElementById('ptype').value==='bags'?'👜':'💎'};products.push(p);render();alert('تمت إضافة المنتج')}
+function toggleLang(){lang=lang==='ar'?'fr':'ar';document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';render();document.getElementById('title').textContent=lang==='ar'?'إليكِ سيدتي':'Ilayki Sayidati';document.getElementById('subtitle').textContent=lang==='ar'?'أناقتكِ تبدأ من التفاصيل الصغيرة ✨':'Votre élégance commence par les petits détails ✨'}
+render();
+</script></body></html>
